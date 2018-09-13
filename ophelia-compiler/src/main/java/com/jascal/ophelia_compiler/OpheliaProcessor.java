@@ -11,12 +11,8 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -160,97 +156,6 @@ public class OpheliaProcessor extends AbstractProcessor {
             }
         }
         return true;
-
-//        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(BindView.class);
-//
-//        // 将获取到的bindview细分到每个class
-//        Map<Element, List<Element>> elementMap = new LinkedHashMap<>();
-//
-//        for (Element element : elements) {
-//            // 返回activity
-//            Element enclosingElement = element.getEnclosingElement();
-//
-//            List<Element> bindViewElements = elementMap.get(enclosingElement);
-//            if (bindViewElements == null) {
-//                bindViewElements = new ArrayList<>();
-//                elementMap.put(enclosingElement, bindViewElements);
-//            }
-//            bindViewElements.add(element);
-//        }
-//
-//        // 生成代码
-//        for (Map.Entry<Element, List<Element>> entrySet : elementMap.entrySet()) {
-//            Element enclosingElement = entrySet.getKey();
-//            List<Element> bindViewElements = entrySet.getValue();
-//
-//            // public final class xxxActivity_ViewBinding implements Unbinder
-//            // 获取activity的类名
-//            String activityClassNameStr = enclosingElement.getSimpleName().toString();
-//            System.out.println("------------->" + activityClassNameStr);
-//            ClassName activityClassName = ClassName.bestGuess(activityClassNameStr);
-//            ClassName unBinderClassName = ClassName.get("com.jascal.ophelia_api", "UnBinder");
-//
-//            TypeSpec.Builder classBuilder =
-//                    TypeSpec.classBuilder(activityClassNameStr + "_ViewBinding")
-//                            .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
-//                            .addSuperinterface(unBinderClassName)
-//                            // 添加属性 private MainActivity target;
-//                            .addField(activityClassName, "target", Modifier.PRIVATE);
-//
-//            // unbind()
-//            ClassName callSuperClassName = ClassName.get("android.support.annotation", "CallSuper");
-//            MethodSpec.Builder unbindMethodBuilder = MethodSpec.methodBuilder("unbind")
-//                    .addAnnotation(Override.class)
-//                    .addAnnotation(callSuperClassName)
-//                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-//
-//            // 构造函数
-//            MethodSpec.Builder constructorMethodBuilder = MethodSpec.constructorBuilder()
-//                    .addParameter(activityClassName, "target")
-//                    .addModifiers(Modifier.PUBLIC)
-//                    // this.target = target
-//                    .addStatement("this.target = target")
-//                    .addStatement("$N($N)", "bindView", "target")
-//                    .addStatement("$N($N)", "setOnClickListener", "target");
-//
-//            MethodSpec.Builder bindViewBuilder = MethodSpec.methodBuilder("bindView")
-//                    .addModifiers(Modifier.PRIVATE)
-//                    .returns(TypeName.VOID)
-//                    .addParameter(activityClassName, "activity");
-//
-//            MethodSpec.Builder setOnClickListenerBuilder = MethodSpec.methodBuilder("setOnClickListener")
-//                    .addModifiers(Modifier.PRIVATE)
-//                    .returns(TypeName.VOID)
-//                    .addParameter(activityClassName, "activity", Modifier.FINAL);
-//
-//            for (Element bindViewElement : bindViewElements) {
-//                String fieldName = bindViewElement.getSimpleName().toString();
-//                ClassName utilsClassName = ClassName.get("com.jascal.ophelia_api", "Utils");
-//                int resourceId = bindViewElement.getAnnotation(BindView.class).value();
-//
-//                bindViewBuilder.addStatement("target.$L = $T.findViewById(target, $L)", fieldName, utilsClassName, resourceId);
-//                unbindMethodBuilder.addStatement("target.$L = null", fieldName);
-//            }
-//
-//
-//            classBuilder.addMethod(unbindMethodBuilder.build())
-//                    .addMethod(constructorMethodBuilder.build())
-//                    .addMethod(bindViewBuilder.build())
-//                    .addMethod(setOnClickListenerBuilder.build());
-//
-//            // 获取包名
-//            String packageName = elementUtils.getPackageOf(enclosingElement).getQualifiedName().toString();
-//
-//            try {
-//                JavaFile.builder(packageName, classBuilder.build())
-//                        .addFileComment("自己写的ButterKnife生成的代码，不要修改！！！")
-//                        .build().writeTo(filer);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        return false;
     }
 
     private Set<TypeElement> getTypeElementsByAnnotationType(Set<? extends TypeElement> annotations, Set<? extends Element> elements) {
