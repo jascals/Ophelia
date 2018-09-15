@@ -27,6 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation project(':ophelia-api')
-    implementation project(':ophelia-annotation')
     annotationProcessor project(':ophelia-compiler')
+    implementation project(':ophelia-annotation')
 }

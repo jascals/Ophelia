@@ -1,12 +1,11 @@
-apply plugin: 'java-library'
+apply plugin: 'java'
 
 apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.mashirosbaumkuchen'
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
