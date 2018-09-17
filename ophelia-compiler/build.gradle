@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.mashirosbaumkuchen'
 
 dependencies {
-    implementation 'com.google.auto.service:auto-service:1.0-rc3'
+    compileOnly 'com.google.auto.service:auto-service:1.0-rc3'
     implementation 'com.squareup:javapoet:1.9.0'
     implementation project(':ophelia-annotation')
 }
