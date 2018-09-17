@@ -5,3 +5,26 @@
 * 轻量级android注解框架
 * 编译时注解，速度快，体积小
 * BindView, OnClick
+
+## usage
+
+### Step 1. Add the JitPack repository to your build file
+Add it in your root build.gradle at the end of repositories:
+'''
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+'''
+
+### Step 2. Add the dependency
+
+'''
+	dependencies {
+		implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-api:v0.81'
+    		implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-annotation:v0.81'
+		annotationProcessor 'com.github.MashirosBaumkuchen.Ophelia:ophelia-compiler:v0.81'
+	}
+'''
