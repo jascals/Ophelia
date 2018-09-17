@@ -28,5 +28,4 @@ dependencies {
 
     implementation project(':ophelia-api')
     annotationProcessor project(':ophelia-compiler')
-    implementation project(':ophelia-annotation')
 }
