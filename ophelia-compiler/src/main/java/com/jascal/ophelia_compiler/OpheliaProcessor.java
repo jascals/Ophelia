@@ -67,91 +67,162 @@ public class OpheliaProcessor extends AbstractProcessor {
             Set<TypeElement> elements = getTypeElementsByAnnotationType(set, roundEnvironment.getRootElements());
 
             for (TypeElement typeElement : elements) {
-                //包名
-                String packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
-                //类名
-                String typeName = typeElement.getSimpleName().toString();
-                //全称类名
-                ClassName className = ClassName.get(packageName, typeName);
-                //自动生成类全称名
-                ClassName autoGenerationClassName = ClassName.get(packageName,
-                        NameUtils.getAutoGeneratorTypeName(typeName));
-
-                //构建自动生成的类
-                TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(autoGenerationClassName)
-                        .addModifiers(Modifier.PUBLIC);
-
-                //构造方法
-                typeBuilder.addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(className, "activity")
-                        .addStatement("$N($N)", "bindView", "activity")
-                        .addStatement("$N($N)", "setOnClickListener", "activity")
-                        .build());
-
-                // bind View
-                MethodSpec.Builder bindViewBuilder = MethodSpec.methodBuilder("bindView")
-                        .addModifiers(Modifier.PRIVATE)
-                        .returns(TypeName.VOID)
-                        .addParameter(className, "activity");
-
-                for (VariableElement variableElement : ElementFilter.fieldsIn(typeElement.getEnclosedElements())) {
-                    BindView bindView = variableElement.getAnnotation(BindView.class);
-                    if (bindView != null) {
-                        bindViewBuilder.addStatement("$N.$N=($T)$N.findViewById($L)",
-                                "activity",
-                                variableElement.getSimpleName(),
-                                variableElement,
-                                "activity",
-                                bindView.value()
-                        );
-                    }
-                }
-
-                typeBuilder.addMethod(bindViewBuilder.build());
-
-                // set OnClick
-                MethodSpec.Builder setOnClickListenerBuilder = MethodSpec.methodBuilder("setOnClickListener")
-                        .addModifiers(Modifier.PRIVATE)
-                        .returns(TypeName.VOID)
-                        .addParameter(className, "activity", Modifier.FINAL);
+                // get class name
+                String packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();// package name
+                String typeName = typeElement.getSimpleName().toString();// class name
 
                 ClassName viewClassName = ClassName.get("android.view", "View");
                 ClassName onClickListenerClassNAme = ClassName.get("android.view", "View", "OnClickListener");
-                for (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
-                    OnClick onClick = executableElement.getAnnotation(OnClick.class);
-                    if (onClick != null) {
-                        //构建匿名class
-                        TypeSpec typeSpec = TypeSpec.anonymousClassBuilder("")
-                                .addSuperinterface(onClickListenerClassNAme)
-                                .addMethod(MethodSpec.methodBuilder("onClick")
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .addParameter(viewClassName, "View")
-                                        .returns(TypeName.VOID)
-                                        .addStatement("$N.$N($N)",
-                                                "activity",
-                                                executableElement.getSimpleName(),
-                                                "View")
-                                        .build())
-                                .build();
 
-                        setOnClickListenerBuilder.addStatement("$N.findViewById($L).setOnClickListener($L)",
-                                "activity",
-                                onClick.value(),
-                                typeSpec);
+                ClassName className = ClassName.get(packageName, typeName);
+                ClassName autoGenerationClassName = ClassName.get(packageName,
+                        NameUtils.getAutoGeneratorTypeName(typeName));
+
+                if (typeName.contains("Activity")) {
+                    // build class start
+                    TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(autoGenerationClassName)
+                            .addModifiers(Modifier.PUBLIC);
+
+                    // constructor
+                    typeBuilder.addMethod(MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PUBLIC)
+                            .addParameter(className, "activity")
+                            .addStatement("$N($N)", "bindView", "activity")
+                            .addStatement("$N($N)", "setOnClickListener", "activity")
+                            .build());
+
+                    // bind View
+                    MethodSpec.Builder bindViewBuilder = MethodSpec.methodBuilder("bindView")
+                            .addModifiers(Modifier.PRIVATE)
+                            .returns(TypeName.VOID)
+                            .addParameter(className, "activity");
+                    for (VariableElement variableElement : ElementFilter.fieldsIn(typeElement.getEnclosedElements())) {
+                        BindView bindView = variableElement.getAnnotation(BindView.class);
+                        if (bindView != null) {
+                            bindViewBuilder.addStatement("$N.$N=($T)$N.findViewById($L)",
+                                    "activity",
+                                    variableElement.getSimpleName(),
+                                    variableElement,
+                                    "activity",
+                                    bindView.value()
+                            );
+                        }
                     }
-                }
+                    typeBuilder.addMethod(bindViewBuilder.build());
 
-                typeBuilder.addMethod(setOnClickListenerBuilder.build());
+                    // set OnClick
+                    MethodSpec.Builder setOnClickListenerBuilder = MethodSpec.methodBuilder("setOnClickListener")
+                            .addModifiers(Modifier.PRIVATE)
+                            .returns(TypeName.VOID)
+                            .addParameter(className, "activity", Modifier.FINAL);
+                    for (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+                        OnClick onClick = executableElement.getAnnotation(OnClick.class);
+                        if (onClick != null) {
+                            //构建匿名class
+                            TypeSpec typeSpec = TypeSpec.anonymousClassBuilder("")
+                                    .addSuperinterface(onClickListenerClassNAme)
+                                    .addMethod(MethodSpec.methodBuilder("onClick")
+                                            .addModifiers(Modifier.PUBLIC)
+                                            .addParameter(viewClassName, "view")
+                                            .returns(TypeName.VOID)
+                                            .addStatement("$N.$N($N)",
+                                                    "activity",
+                                                    executableElement.getSimpleName(),
+                                                    "view")
+                                            .build())
+                                    .build();
 
-                //写入java文件
-                try {
-                    JavaFile.builder(packageName, typeBuilder.build())
-                            .addFileComment("自己写的ButterKnife生成的代码，不要修改！！！")
-                            .build()
-                            .writeTo(filer);
-                } catch (IOException e) {
-                    messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
+                            setOnClickListenerBuilder.addStatement("$N.findViewById($L).setOnClickListener($L)",
+                                    "activity",
+                                    onClick.value(),
+                                    typeSpec);
+                        }
+                    }
+                    typeBuilder.addMethod(setOnClickListenerBuilder.build());
+
+                    //写入java文件
+                    try {
+                        JavaFile.builder(packageName, typeBuilder.build())
+                                .addFileComment("自己写的ButterKnife生成的代码，不要修改！！！")
+                                .build()
+                                .writeTo(filer);
+                    } catch (IOException e) {
+                        messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
+                    }
+
+                } else if (typeName.contains("Fragment")) {
+                    // build class start
+                    TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(autoGenerationClassName)
+                            .addModifiers(Modifier.PUBLIC);
+
+                    // constructor
+                    typeBuilder.addMethod(MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PUBLIC)
+                            .addParameter(className, "fragment")
+                            .addParameter(viewClassName, "view")
+                            .addStatement("$N($N,$N)", "bindView", "fragment", "view")
+                            .addStatement("$N($N,$N)", "setOnClickListener", "fragment", "view")
+                            .build());
+
+                    // bind View
+                    MethodSpec.Builder bindViewInFragmentBuilder = MethodSpec.methodBuilder("bindView")
+                            .addModifiers(Modifier.PRIVATE)
+                            .returns(TypeName.VOID)
+                            .addParameter(className, "fragment")
+                            .addParameter(viewClassName, "view");
+                    for (VariableElement variableElement : ElementFilter.fieldsIn(typeElement.getEnclosedElements())) {
+                        BindView bindView = variableElement.getAnnotation(BindView.class);
+                        if (bindView != null) {
+                            bindViewInFragmentBuilder.addStatement("$N.$N=($T)$N.findViewById($L)",
+                                    "fragment",
+                                    variableElement.getSimpleName(),
+                                    variableElement,
+                                    "view",
+                                    bindView.value()
+                            );
+                        }
+                    }
+                    typeBuilder.addMethod(bindViewInFragmentBuilder.build());
+
+                    MethodSpec.Builder setOnClickListenerInFragmentBuilder = MethodSpec.methodBuilder("setOnClickListener")
+                            .addModifiers(Modifier.PRIVATE)
+                            .returns(TypeName.VOID)
+                            .addParameter(className, "fragment", Modifier.FINAL)
+                            .addParameter(viewClassName, "view", Modifier.FINAL);
+                    for (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+                        OnClick onClick = executableElement.getAnnotation(OnClick.class);
+                        if (onClick != null) {
+                            //构建匿名class
+                            TypeSpec typeSpec = TypeSpec.anonymousClassBuilder("")
+                                    .addSuperinterface(onClickListenerClassNAme)
+                                    .addMethod(MethodSpec.methodBuilder("onClick")
+                                            .addModifiers(Modifier.PUBLIC)
+                                            .addParameter(viewClassName, "view")
+                                            .returns(TypeName.VOID)
+                                            .addStatement("$N.$N($N)",
+                                                    "fragment",
+                                                    executableElement.getSimpleName(),
+                                                    "view")
+                                            .build())
+                                    .build();
+
+                            setOnClickListenerInFragmentBuilder.addStatement("$N.findViewById($L).setOnClickListener($L)",
+                                    "view",
+                                    onClick.value(),
+                                    typeSpec);
+                        }
+                    }
+                    typeBuilder.addMethod(setOnClickListenerInFragmentBuilder.build());
+
+                    //写入java文件
+                    try {
+                        JavaFile.builder(packageName, typeBuilder.build())
+                                .addFileComment("自己写的ButterKnife生成的代码，不要修改！！！")
+                                .build()
+                                .writeTo(filer);
+                    } catch (IOException e) {
+                        messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
+                    }
                 }
             }
         }
