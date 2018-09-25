@@ -23,8 +23,8 @@ allprojects {
 
 ```
 dependencies {
-	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-api:v0.81'
-	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-annotation:v0.81'
-	annotationProcessor 'com.github.MashirosBaumkuchen.Ophelia:ophelia-compiler:v0.81'
+	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-api:v1.0'
+	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-annotation:v1.0'
+	annotationProcessor 'com.github.MashirosBaumkuchen.Ophelia:ophelia-compiler:v1.0'
 }
 ```
