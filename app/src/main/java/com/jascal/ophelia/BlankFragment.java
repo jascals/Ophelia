@@ -15,10 +15,10 @@ import com.jascal.ophelia_api.Ophelia;
 
 public class BlankFragment extends Fragment {
 
-    @BindView(R.id.textview)
-    TextView textView;
+//    @BindView(R.id.textview)
+//    TextView textView;
 
-    @OnClick(R.id.button)
+    @OnClick(R.id.button_f)
     void test(View view) {
         Toast.makeText(getActivity(), "text", Toast.LENGTH_LONG).show();
     }
@@ -34,7 +34,7 @@ public class BlankFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_blank, container, false);
         Ophelia.bind(this, view);
 
-        textView.setText("successful!");
+//        textView.setText("successful!");
         return view;
     }
 

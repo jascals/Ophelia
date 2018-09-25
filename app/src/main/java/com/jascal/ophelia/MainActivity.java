@@ -17,17 +17,17 @@ public class MainActivity extends AppCompatActivity {
 //    @BindView(R.id.textview)
 //    TextView textView;
 //
-//    @OnClick(R.id.button)
-//    void send(View view) {
-//        Toast.makeText(this, "clicked!", Toast.LENGTH_LONG).show();
-//    }
+    @OnClick(R.id.button)
+    void send(View view) {
+        Toast.makeText(this, "clicked!", Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Ophelia.bind(this);
+        Ophelia.bind(this);
 
 //        textView.setText("successful!");
 
