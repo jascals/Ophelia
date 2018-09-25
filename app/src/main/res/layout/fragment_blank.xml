@@ -16,7 +16,8 @@
         android:id="@+id/button_f"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_below="@+id/textview"
+        android:layout_below="@+id/textview_f"
+        android:layout_centerHorizontal="true"
         android:text="text" />
 
 </RelativeLayout>

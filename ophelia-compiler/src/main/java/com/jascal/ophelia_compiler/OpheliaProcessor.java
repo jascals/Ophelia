@@ -27,6 +27,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
@@ -95,10 +96,7 @@ public class OpheliaProcessor extends AbstractProcessor {
             Annotation annotation = method.getAnnotation(clazz);
 
             String methodName = method.getSimpleName().toString();
-            if (annotation instanceof BindView) {
-                int value = ((BindView) annotation).value();
-                proxy.bindViewMap.put(methodName, value);
-            } else if (annotation instanceof OnClick) {
+            if (annotation instanceof OnClick) {
                 int value = ((OnClick) annotation).value();
                 proxy.onClickMap.put(methodName, value);
             } else {
@@ -110,7 +108,35 @@ public class OpheliaProcessor extends AbstractProcessor {
         return true;
     }
 
-    private boolean isAnnotationWithVariable(RoundEnvironment environment, Class<? extends Annotation> clazz){
+    private boolean isAnnotationWithVariable(RoundEnvironment environment, Class<? extends Annotation> clazz) {
+        Set<? extends Element> elements = environment.getElementsAnnotatedWith(clazz);
+        for (Element element : elements) {
+            if (isValid(element)) {
+                return false;
+            }
+            VariableElement variable = (VariableElement) element;
+            TypeElement typeElement = (TypeElement) variable.getEnclosingElement();
+            String typeName = typeElement.getQualifiedName().toString();
+
+            Proxy proxy = proxyMap.get(typeName);
+            if (proxy == null) {
+                proxy = new Proxy(elementUtils, typeElement);
+                proxyMap.put(typeName, proxy);
+            }
+
+            Annotation annotation = variable.getAnnotation(clazz);
+
+            String variableName = variable.getSimpleName().toString();
+
+            if (annotation instanceof BindView) {
+                int value = ((BindView) annotation).value();
+                proxy.bindViewMap.put(variableName, value);
+                proxy.bindType.put(variableName, variable);
+            } else {
+                error(variable, "%s not support.", variable);
+                return false;
+            }
+        }
         return true;
     }
 
@@ -118,7 +144,7 @@ public class OpheliaProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         proxyMap.clear();
-//        if (!isAnnotationWithMethod(roundEnvironment, BindView.class)) return false;
+        if (!isAnnotationWithVariable(roundEnvironment, BindView.class)) return false;
         if (!isAnnotationWithMethod(roundEnvironment, OnClick.class)) return false;
 
         for (Proxy proxy : proxyMap.values()) {
@@ -159,12 +185,12 @@ public class OpheliaProcessor extends AbstractProcessor {
                     .returns(TypeName.VOID)
                     .addParameter(className, "activity");
             for (Map.Entry<String, Integer> entry : proxy.bindViewMap.entrySet()) {
-                String methodName = entry.getKey();
+                String variableName = entry.getKey();
                 int value = entry.getValue();
                 bindViewBuilder.addStatement("$N.$N=($T)$N.findViewById($L)",
                         "activity",
-                        methodName,
-                        methodName,
+                        variableName,
+                        proxy.bindType.get(variableName),
                         "activity",
                         value
                 );
@@ -230,12 +256,12 @@ public class OpheliaProcessor extends AbstractProcessor {
                     .addParameter(className, "fragment")
                     .addParameter(viewClassName, "view");
             for (Map.Entry<String, Integer> entry : proxy.bindViewMap.entrySet()) {
-                String methodName = entry.getKey();
+                String variableName = entry.getKey();
                 int value = entry.getValue();
                 bindViewInFragmentBuilder.addStatement("$N.$N=($T)$N.findViewById($L)",
                         "fragment",
-                        methodName,
-                        methodName,
+                        variableName,
+                        proxy.bindType.get(variableName),
                         "view",
                         value
                 );

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 class Proxy {
@@ -33,6 +34,8 @@ class Proxy {
 
     Map<String, Integer> bindViewMap = new HashMap<>();
     Map<String, Integer> onClickMap = new HashMap<>();
+
+    Map<String, VariableElement> bindType = new HashMap<>();
 
     Proxy(Elements elementUtils, TypeElement element) {
         this.element = element;

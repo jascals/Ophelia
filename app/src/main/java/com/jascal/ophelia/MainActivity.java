@@ -14,9 +14,9 @@ import com.jascal.ophelia_api.Ophelia;
 
 public class MainActivity extends AppCompatActivity {
 
-//    @BindView(R.id.textview)
-//    TextView textView;
-//
+    @BindView(R.id.textview)
+    TextView textView;
+
     @OnClick(R.id.button)
     void send(View view) {
         Toast.makeText(this, "clicked!", Toast.LENGTH_LONG).show();
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         Ophelia.bind(this);
 
-//        textView.setText("successful!");
+        textView.setText("successful!");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
