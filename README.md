@@ -28,3 +28,10 @@ dependencies {
 	annotationProcessor 'com.github.MashirosBaumkuchen.Ophelia:ophelia-compiler:v1.0'
 }
 ```
+
+## v1.0
+
+* add fragment support
+* add mult-file support
+* ...
+* todo: unbind, cache...
