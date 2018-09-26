@@ -54,6 +54,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
 ```
 
 ### Step 4. Usage
+-------
 ```
 @BindView(R.id.button)
 Button button;
