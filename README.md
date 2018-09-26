@@ -6,7 +6,7 @@
 * base on android-apt
 * @BindView, @OnClick...
 
-## usage
+## How to
 -------
 ### Step 1. Add the JitPack repository to your build file
 -------
@@ -27,6 +27,40 @@ dependencies {
 	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-api:v1.0'
 	implementation 'com.github.MashirosBaumkuchen.Ophelia:ophelia-annotation:v1.0'
 	annotationProcessor 'com.github.MashirosBaumkuchen.Ophelia:ophelia-compiler:v1.0'
+}
+```
+
+### Step 3. Bind container
+-------
+* for activity
+```	
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+	...
+	Ophelia.bind(this);
+	...
+}
+```
+
+* for fragment
+```
+@Override
+public View onCreateView(LayoutInflater inflater, ViewGroup container,
+		     Bundle savedInstanceState) {
+	View view = inflater.inflate(R.layout.fragment_blank, container, false);
+	Ophelia.bind(this, view);
+	...
+}
+```
+
+### Step 4. Usage
+```
+@BindView(R.id.button)
+Button button;
+
+@OnClick(R.id.button1)
+void click(View view){
+	...
 }
 ```
 
